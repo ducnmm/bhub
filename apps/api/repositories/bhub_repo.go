@@ -100,16 +100,11 @@ func (r *BHubRepository) AddMember(ctx context.Context, bhubID, userID string) e
 }
 
 // List retrieves BHubs based on filters
-func (r *BHubRepository) List(ctx context.Context, location string, timeAfter time.Time) ([]*models.BHub, error) {
+func (r *BHubRepository) List(ctx context.Context, timeAfter time.Time) ([]*models.BHub, error) {
 	var bhubs []*models.BHub
 
 	// Start with base query
 	query := r.Client.Collection("bhubs").Where("status", "==", "open")
-
-	// Add location filter if provided
-	if location != "" {
-		query = query.Where("location", "==", location)
-	}
 
 	// Add time filter if provided
 	if !timeAfter.IsZero() {

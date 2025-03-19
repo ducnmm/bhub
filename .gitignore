@@ -1,1 +1,11 @@
-apps/api/bhub-local.json
+# Firebase credentials
+**/firebase_options.dart
+**/google-services.json
+**/GoogleService-Info.plist
+**/*.keystore
+**/*.jks
+**/bhub-local.json
+
+# Environment files
+**/.env
+**/.env.*

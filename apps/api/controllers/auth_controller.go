@@ -17,15 +17,14 @@ func NewAuthController(authService *services.AuthService) *AuthController {
 	return &AuthController{AuthService: authService}
 }
 
-// LoginRequest represents the login request body
-type LoginRequest struct {
+// GoogleAuthRequest represents the Google authentication request body
+type GoogleAuthRequest struct {
 	IDToken string `json:"id_token" binding:"required"`
 }
 
-// Login handles user authentication with Firebase
-func (c *AuthController) Login(ctx *gin.Context) {
-	// Parse request body
-	var req LoginRequest
+// GoogleLogin handles user authentication with Google
+func (c *AuthController) GoogleLogin(ctx *gin.Context) {
+	var req GoogleAuthRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request format"})
 		return

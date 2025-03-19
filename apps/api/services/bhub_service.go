@@ -88,34 +88,34 @@ func (s *BHubService) JoinBHub(ctx context.Context, req *models.BHubJoinRequest)
 }
 
 // ListBHubs retrieves available BHubs
-func (s *BHubService) ListBHubs(ctx context.Context, location string) ([]*models.BHubResponse, error) {
-	// Get BHubs from current time onwards
-	bhubs, err := s.BHubRepo.List(ctx, location, time.Now())
-	if err != nil {
-		return nil, err
-	}
+func (s *BHubService) ListBHubs(ctx context.Context) ([]*models.BHubResponse, error) {  // Removed location parameter
+    // Get BHubs from current time onwards
+    bhubs, err := s.BHubRepo.List(ctx, time.Now())
+    if err != nil {
+        return nil, err
+    }
 
-	var responses []*models.BHubResponse
-	for _, bhub := range bhubs {
-		// Get host information
-		host, err := s.UserRepo.GetByID(ctx, bhub.HostID)
-		if err != nil {
-			continue
-		}
+    var responses []*models.BHubResponse
+    for _, bhub := range bhubs {
+        // Get host information
+        host, err := s.UserRepo.GetByID(ctx, bhub.HostID)
+        if err != nil {
+            continue
+        }
 
-		responses = append(responses, &models.BHubResponse{
-			ID:             bhub.ID,
-			Location:       bhub.Location,
-			TimeSlot:       bhub.TimeSlot,
-			CurrentMembers: len(bhub.Members),
-			MaxMembers:     bhub.MaxMembers,
-			PricePerPerson: bhub.PricePerPerson,
-			Host:           host.Name,
-			Status:         bhub.Status,
-		})
-	}
+        responses = append(responses, &models.BHubResponse{
+            ID:             bhub.ID,
+            Location:       bhub.Location,
+            TimeSlot:       bhub.TimeSlot,
+            CurrentMembers: len(bhub.Members),
+            MaxMembers:     bhub.MaxMembers,
+            PricePerPerson: bhub.PricePerPerson,
+            Host:           host.Name,
+            Status:         bhub.Status,
+        })
+    }
 
-	return responses, nil
+    return responses, nil
 }
 
 // GetBHub retrieves a specific BHub by ID

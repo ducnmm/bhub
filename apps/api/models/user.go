@@ -10,6 +10,7 @@ type User struct {
 	Name      string    `json:"name" firestore:"name"`
 	Email     string    `json:"email" firestore:"email"`
 	PhotoURL  string    `json:"photo_url,omitempty" firestore:"photo_url,omitempty"`
+	Role      string    `json:"role" firestore:"role"`
 	CreatedAt time.Time `json:"created_at" firestore:"created_at"`
 	UpdatedAt time.Time `json:"updated_at" firestore:"updated_at"`
 }
@@ -20,5 +21,6 @@ type UserResponse struct {
 	Name     string `json:"name"`
 	Email    string `json:"email"`
 	PhotoURL string `json:"photo_url,omitempty"`
+	Role     string `json:"role"`
 	Token    string `json:"token,omitempty"`
 }

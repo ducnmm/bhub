@@ -40,18 +40,15 @@ func (c *BHubController) CreateBHub(ctx *gin.Context) {
 
 // ListBHubs handles retrieving a list of available BHubs
 func (c *BHubController) ListBHubs(ctx *gin.Context) {
-	// Get location filter from query parameters
-	location := ctx.Query("location")
+    // Get BHubs
+    bhubs, err := c.BHubService.ListBHubs(ctx.Request.Context())  // Removed location parameter
+    if err != nil {
+        ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+        return
+    }
 
-	// Get BHubs
-	bhubs, err := c.BHubService.ListBHubs(ctx.Request.Context(), location)
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-
-	// Return response
-	ctx.JSON(http.StatusOK, bhubs)
+    // Return response
+    ctx.JSON(http.StatusOK, bhubs)
 }
 
 // GetBHub handles retrieving a specific BHub by ID

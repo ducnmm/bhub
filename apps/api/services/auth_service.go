@@ -29,23 +29,24 @@ func (s *AuthService) VerifyIDToken(ctx context.Context, idToken string) (*model
 	// Get Firebase Auth client
 	authClient, err := s.FirebaseApp.Auth(ctx)
 	if err != nil {
-		return nil, err
+		return nil, errors.New("failed to initialize auth client")
 	}
 
 	// Verify the ID token
 	token, err := authClient.VerifyIDToken(ctx, idToken)
 	if err != nil {
-		return nil, err
+		return nil, errors.New("invalid or expired ID token")
 	}
 
 	// Get user from Firebase Auth
 	firebaseUser, err := authClient.GetUser(ctx, token.UID)
 	if err != nil {
-		return nil, err
+		return nil, errors.New("failed to get user from Firebase")
 	}
 
 	// Check if user exists in Firestore
 	user, err := s.UserRepo.GetByID(ctx, token.UID)
+
 	if err != nil || user == nil {
 		// Create new user if not exists
 		user = &models.User{
@@ -53,20 +54,27 @@ func (s *AuthService) VerifyIDToken(ctx context.Context, idToken string) (*model
 			Name:      firebaseUser.DisplayName,
 			Email:     firebaseUser.Email,
 			PhotoURL:  firebaseUser.PhotoURL,
+			Role:      "user", // Default role for new users
 			CreatedAt: time.Now(),
 			UpdatedAt: time.Now(),
 		}
 
 		// Save user to Firestore
 		if err := s.UserRepo.Create(ctx, user); err != nil {
-			return nil, err
+			return nil, errors.New("failed to create user in database")
+		}
+	} else {
+		// Update UpdatedAt for existing user
+		user.UpdatedAt = time.Now()
+		if err := s.UserRepo.Update(ctx, user); err != nil {
+			// Just log the error and continue since it's not critical
 		}
 	}
 
 	// Create custom token for client
 	customToken, err := authClient.CustomToken(ctx, user.ID)
 	if err != nil {
-		return nil, err
+		return nil, errors.New("failed to generate custom token")
 	}
 
 	// Return user response
@@ -75,6 +83,7 @@ func (s *AuthService) VerifyIDToken(ctx context.Context, idToken string) (*model
 		Name:     user.Name,
 		Email:    user.Email,
 		PhotoURL: user.PhotoURL,
+		Role:     user.Role,
 		Token:    customToken,
 	}, nil
 }
@@ -82,27 +91,4 @@ func (s *AuthService) VerifyIDToken(ctx context.Context, idToken string) (*model
 // GetUserByID retrieves a user by ID
 func (s *AuthService) GetUserByID(ctx context.Context, userID string) (*models.User, error) {
 	return s.UserRepo.GetByID(ctx, userID)
-}
-
-// VerifyUser verifies if a user exists and is valid
-func (s *AuthService) VerifyUser(ctx context.Context, userID string) error {
-	// Get Firebase Auth client
-	authClient, err := s.FirebaseApp.Auth(ctx)
-	if err != nil {
-		return err
-	}
-
-	// Check if user exists in Firebase Auth
-	_, err = authClient.GetUser(ctx, userID)
-	if err != nil {
-		return errors.New("invalid user ID")
-	}
-
-	// Check if user exists in Firestore
-	user, err := s.UserRepo.GetByID(ctx, userID)
-	if err != nil || user == nil {
-		return errors.New("user not found in database")
-	}
-
-	return nil
 }

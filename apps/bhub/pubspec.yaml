@@ -1,0 +1,33 @@
+name: bhub
+description: A Flutter mobile application for BHub that allows users to join badminton hub groups, make payments, and manage their profiles.
+
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+  firebase_core: ^3.2.0
+  firebase_auth: ^5.1.2
+  cloud_firestore: ^5.1.0
+  provider: ^6.1.2
+  dio: ^5.5.0
+  flutter_secure_storage: ^9.2.2
+  intl: ^0.19.0
+  google_fonts: ^6.2.1
+  google_sign_in: ^6.2.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.2
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/images/

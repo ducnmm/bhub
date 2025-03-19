@@ -28,6 +28,7 @@ func SetupRoutes(router *gin.Engine, ctx context.Context, firebaseApp *firebase.
 	authController := controllers.NewAuthController(authService)
 	bhubController := controllers.NewBHubController(bhubService)
 	paymentController := controllers.NewPaymentController(paymentService)
+	userController := controllers.NewUserController(authService)
 
 	// Initialize middleware
 	authMiddleware := middleware.NewAuthMiddleware(authService)
@@ -41,10 +42,18 @@ func SetupRoutes(router *gin.Engine, ctx context.Context, firebaseApp *firebase.
 		c.JSON(200, gin.H{"status": "ok"})
 	})
 
-	// Auth routes
+	// User routes
+	userRoutes := router.Group("/api/users")
+	{
+		// Only allow getting user by ID, no user creation via direct API
+		// Users are created automatically during Google authentication
+		userRoutes.GET("/:id", userController.GetUser)
+	}
+
+	// Auth routes - Only Google authentication is supported
 	authRoutes := router.Group("/auth")
 	{
-		authRoutes.POST("/login", authController.Login)
+		authRoutes.POST("/google/login", authController.GoogleLogin)
 	}
 
 	// BHub routes
